@@ -60,7 +60,10 @@
 )
 
 (define-map producer-ratings
-    { producer: principal, certifier: principal }
+    {
+        producer: principal,
+        certifier: principal,
+    }
     {
         quality-score: uint,
         delivery-score: uint,
@@ -333,24 +336,43 @@
         (delivery-score uint)
         (sustainability-score uint)
     )
-    (let ((current-block u1) (rating-key { producer: producer, certifier: tx-sender }))
+    (let (
+            (current-block u1)
+            (rating-key {
+                producer: producer,
+                certifier: tx-sender,
+            })
+        )
         (begin
             (asserts!
                 (default-to false (map-get? authorized-certifiers tx-sender))
                 err-not-authorized
             )
-            (asserts! (is-some (map-get? producers producer)) err-producer-not-found)
-            (asserts! (and (>= quality-score u1) (<= quality-score u10)) err-invalid-rating)
-            (asserts! (and (>= delivery-score u1) (<= delivery-score u10)) err-invalid-rating)
-            (asserts! (and (>= sustainability-score u1) (<= sustainability-score u10)) err-invalid-rating)
-            (asserts! (is-none (map-get? producer-ratings rating-key)) err-feedback-exists)
+            (asserts! (is-some (map-get? producers producer))
+                err-producer-not-found
+            )
+            (asserts! (and (>= quality-score u1) (<= quality-score u10))
+                err-invalid-rating
+            )
+            (asserts! (and (>= delivery-score u1) (<= delivery-score u10))
+                err-invalid-rating
+            )
+            (asserts!
+                (and (>= sustainability-score u1) (<= sustainability-score u10))
+                err-invalid-rating
+            )
+            (asserts! (is-none (map-get? producer-ratings rating-key))
+                err-feedback-exists
+            )
             (map-set producer-ratings rating-key {
                 quality-score: quality-score,
                 delivery-score: delivery-score,
                 sustainability-score: sustainability-score,
                 rated-at: current-block,
             })
-            (unwrap! (update-producer-quality-summary producer) err-not-authorized)
+            (unwrap! (update-producer-quality-summary producer)
+                err-not-authorized
+            )
             (ok true)
         )
     )
@@ -358,8 +380,14 @@
 
 (define-private (update-producer-quality-summary (producer principal))
     (let (
-            (current-summary (default-to 
-                { total-ratings: u0, avg-quality: u0, avg-delivery: u0, avg-sustainability: u0, overall-score: u0, last-updated: u0 } 
+            (current-summary (default-to {
+                total-ratings: u0,
+                avg-quality: u0,
+                avg-delivery: u0,
+                avg-sustainability: u0,
+                overall-score: u0,
+                last-updated: u0,
+            }
                 (map-get? producer-quality-summary producer)
             ))
             (new-total (+ (get total-ratings current-summary) u1))
@@ -381,17 +409,31 @@
 (define-public (calculate-producer-score (producer principal))
     (let (
             (ratings-count u0)
-            (quality-total u0) 
+            (quality-total u0)
             (delivery-total u0)
             (sustainability-total u0)
         )
         (begin
-            (asserts! (is-some (map-get? producers producer)) err-producer-not-found)
+            (asserts! (is-some (map-get? producers producer))
+                err-producer-not-found
+            )
             (let (
-                    (avg-quality (if (> ratings-count u0) (/ quality-total ratings-count) u0))
-                    (avg-delivery (if (> ratings-count u0) (/ delivery-total ratings-count) u0))
-                    (avg-sustainability (if (> ratings-count u0) (/ sustainability-total ratings-count) u0))
-                    (overall-score (if (> ratings-count u0) (/ (+ avg-quality avg-delivery avg-sustainability) u3) u0))
+                    (avg-quality (if (> ratings-count u0)
+                        (/ quality-total ratings-count)
+                        u0
+                    ))
+                    (avg-delivery (if (> ratings-count u0)
+                        (/ delivery-total ratings-count)
+                        u0
+                    ))
+                    (avg-sustainability (if (> ratings-count u0)
+                        (/ sustainability-total ratings-count)
+                        u0
+                    ))
+                    (overall-score (if (> ratings-count u0)
+                        (/ (+ avg-quality avg-delivery avg-sustainability) u3)
+                        u0
+                    ))
                 )
                 (map-set producer-quality-summary producer {
                     total-ratings: ratings-count,
@@ -414,11 +456,14 @@
     )
 )
 
-(define-read-only (get-producer-rating 
-        (producer principal) 
+(define-read-only (get-producer-rating
+        (producer principal)
         (certifier principal)
     )
-    (ok (map-get? producer-ratings { producer: producer, certifier: certifier }))
+    (ok (map-get? producer-ratings {
+        producer: producer,
+        certifier: certifier,
+    }))
 )
 
 (define-read-only (get-producer-quality-summary-data (producer principal))

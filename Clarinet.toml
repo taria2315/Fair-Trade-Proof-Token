@@ -8,5 +8,8 @@ cache_dir = "./.clarinet"
 [contracts.fair-trade-proof-token]
 path = "contracts/fair-trade-proof-token.clar"
 
+[contracts.role-registry]
+path = "contracts/role-registry.clar"
+
 [repl]
 costs = false

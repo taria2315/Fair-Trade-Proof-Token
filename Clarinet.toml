@@ -1,0 +1,15 @@
+[project]
+name = "fair-trade-proof-token"
+description = "A Clarity smart contract for Fair Trade Proof Tokens"
+authors = ["taria2315@gmail.com"]
+telemetry = false
+cache_dir = "./.clarinet"
+
+[contracts.fair-trade-proof-token]
+path = "contracts/fair-trade-proof-token.clar"
+
+[contracts.role-registry]
+path = "contracts/role-registry.clar"
+
+[repl]
+costs = false

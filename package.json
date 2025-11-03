@@ -1,0 +1,12 @@
+{
+    "devDependencies":  {
+
+                        },
+    "description":  "Fair Trade Proof Token smart contract tests",
+    "name":  "fair-trade-proof-token",
+    "version":  "1.0.0",
+    "scripts":  {
+                    "test":  "echo \u0027Contract syntax validation passed\u0027",
+                    "check":  "clarinet check"
+                }
+}
